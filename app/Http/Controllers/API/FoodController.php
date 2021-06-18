@@ -26,13 +26,12 @@ class FoodController extends Controller
 
         $validator = Validator::make($input,
         [
-            'name' => 'required|max:255',
-            'picturePath' => 'required|image',
-            'description' => 'required',
-            'ingredients' => 'required',
-            'price' => 'required|integer',
-            'quantity' => 'required|integer',
-            'rate' => 'required|integer',
+            'name' => 'max:255',
+            'description' => '',
+            'ingredients' => '',
+            'price' => 'integer',
+            'quantity' => 'integer',
+            'rate' => 'integer',
             'types' => '',
         ]);
 
