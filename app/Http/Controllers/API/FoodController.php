@@ -6,61 +6,110 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Food;
 use App\Helpers\ResponseFormatter;
+use Validator;
 
 class FoodController extends Controller
 {
-    public function all(Request $request){
-        $id = $request->input('id');
-        $limit = $request->input('limit', 6);
-        $name = $request->input('name');
-        $types = $request->input('types');
 
-        $price_from = $request->input('price_from');
-        $price_to = $request->input('price_to');
 
-        $rate_from = $request->input('rate_from');
-        $rate_to = $request->input('rate_to');
-
-        if($id)
-        {
-            $food = Food::find($id);
-
-            if($food)
-                return ResponseFormatter::success(
-                    $food,
-                    'Data produk berhasil diambil'
-                );
-            else
-                return ResponseFormatter::error(
-                    null,
-                    'Data produk tidak ada',
-                    404
-                );
-        }
-
-        $food = Food::query();
-
-        if($name)
-            $food->where('name', 'like', '%' . $name . '%');
-
-        if($types)
-            $food->where('types', 'like', '%' . $types . '%');
-
-        if($price_from)
-            $food->where('price', '>=', $price_from);
-
-        if($price_to)
-            $food->where('price', '<=', $price_to);
-
-        if($rate_from)
-            $food->where('rate', '>=', $rate_from);
-
-        if($rate_to)
-            $food->where('rate', '<=', $rate_to);
+    public function index(){
+        
+        $food = Food::all();
 
         return ResponseFormatter::success(
-            $food->paginate($limit),
+            $food,
             'Data list produk berhasil diambil'
+        );
+    }
+
+    public function store(Request $request){
+        $input = $request->all();
+
+        $validator = Validator::make($input,
+        [
+            'name' => 'required|max:255',
+            'picturePath' => 'required|image',
+            'description' => 'required',
+            'ingredients' => 'required',
+            'price' => 'required|integer',
+            'rate' => 'required|integer',
+            'types' => '',
+        ]);
+
+        if($validator->fails()){
+            return ResponseFormatter::error(
+                null,
+                $validator->errors(),
+                400 
+            );
+        }
+
+        $food = Food::create($input);
+
+        return ResponseFormatter::success(
+            $food,
+            'Data list produk berhasil ditambahkan'
+        );
+    }
+
+    public function show($id){
+        $food = Food::find($id);
+
+        if(!($food)){
+            return ResponseFormatter::error(
+                null,
+                'Food tidak ditemukan',
+                404 
+            );
+        }
+
+        return ResponseFormatter::success(
+            $food,
+            'Data list produk berhasil diambil'
+        );
+    }
+
+    public function update(Request $request, Food $food){
+        $input = $request->all();
+
+        $validator = Validator::make($input,
+        [
+            'name' => 'required|max:255',
+            'description' => 'required',
+            'ingredients' => 'required',
+            'price' => 'required|integer',
+            'rate' => 'required|integer',
+            'types' => '',
+        ]);
+
+        if($validator->fails()){
+            return ResponseFormatter::error(
+                null,
+                $validator->errors(),
+                400 
+            );
+        }
+
+        $food->name = $input['name'];
+        $food->description = $input['description'];
+        $food->ingredients = $input['ingredients'];
+        $food->rate = $input['rate'];
+        $food->price = $input['price'];
+        $food->types = $input['types'];
+        $food->save();
+
+        return ResponseFormatter::success(
+            $food,
+            'Data list produk berhasil diedit'
+        );
+    }
+
+    public function destroy(Food $food)
+    {
+        $food->delete();
+        return ResponseFormatter::success(
+            null,
+            'Data list produk berhasil dihapus'
         );
     }
 }
