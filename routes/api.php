@@ -17,9 +17,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+Route::resource('food', 'API\FoodController');
 
 Route::get('transaction', 'API\TransactionController@all');
 Route::post('transaction/{id}', 'API\TransactionController@update');
 Route::post('checkout', 'API\TransactionController@checkout');
-
-Route::resource('food', 'API\FoodController');
