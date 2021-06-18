@@ -44,7 +44,7 @@ class FoodController extends Controller
         }
 
         $food = Food::create($input);
-        // Redis::flushDB();
+        Redis::flushDB();
         return ResponseFormatter::success(
             $food,
             'Data list produk berhasil ditambahkan'
