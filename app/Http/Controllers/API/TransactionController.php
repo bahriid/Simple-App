@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Helpers\ResponseFormatter;
+use App\Models\Food;
 use App\Models\Transaction;
 
 class TransactionController extends Controller
@@ -41,7 +42,7 @@ class TransactionController extends Controller
             $transaction->where('status', $status);
 
         return ResponseFormatter::success(
-            $transaction->paginate($limit),
+            $transaction->get(),
             'Data list transaksi berhasil diambil'
         );
     }
@@ -54,12 +55,35 @@ class TransactionController extends Controller
             'status' => 'required',
         ]);
 
+        $food = Food::where('id', $request->food_id)->first();
+
+        if($food){
+            $food['quantity'] = $food['quantity'] - $request->quantity;
+            
+            if($food['quantity'] < 0){
+                return ResponseFormatter::error(
+                    null,
+                    'Jumlah barang tidak cukup',
+                    400
+                );
+            }
+
+            $food->save();
+        }else{
+            return ResponseFormatter::error(
+                null,
+                'Data food tidak ada',
+                400
+            );
+        }
+
         $transaction = Transaction::create([
             'food_id' => $request->food_id,
             'quantity' => $request->quantity,
             'total' => $request->total,
             'status' => $request->status,
         ]);
+
 
         
         // Redirect ke halaman midtrans
