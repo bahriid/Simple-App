@@ -3,11 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Transaction extends Model
 {
-    use HasFactory;
+    
 
     /**
      * The attributes that are mass assignable.
@@ -22,4 +21,9 @@ class Transaction extends Model
         'status',
         'payment_url'
     ];
+
+    public function food()
+    {
+        return $this->hasOne(Food::class,'id','food_id');
+    }
 }
