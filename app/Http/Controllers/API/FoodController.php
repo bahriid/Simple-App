@@ -7,13 +7,12 @@ use Illuminate\Http\Request;
 use App\Models\Food;
 use App\Helpers\ResponseFormatter;
 use Validator;
-
+use Illuminate\Support\Facades\Redis;
 class FoodController extends Controller
 {
 
 
     public function index(){
-        
         $food = Food::all();
 
         return ResponseFormatter::success(
@@ -46,7 +45,7 @@ class FoodController extends Controller
         }
 
         $food = Food::create($input);
-
+        // Redis::flushDB();
         return ResponseFormatter::success(
             $food,
             'Data list produk berhasil ditambahkan'
@@ -54,20 +53,27 @@ class FoodController extends Controller
     }
 
     public function show($id){
-        $food = Food::find($id);
+        $cachedFood = Redis::get('food_' . $id);
+        
+        if(isset($cachedFood)) {
+            $food = json_decode($cachedFood, FALSE);
 
-        if(!($food)){
-            return ResponseFormatter::error(
-                null,
-                'Food tidak ditemukan',
-                404 
-            );
+            return ResponseFormatter::success([
+                $food,
+                'Fetched from redis'
+            ]);
+            
+        }else{
+            $food = Food::find($id);
+            Redis::set('food_' . $id, $food);
+        
+            return ResponseFormatter::success([
+                $food,
+                'Fetched from database'
+            ]);
+            
+
         }
-
-        return ResponseFormatter::success(
-            $food,
-            'Data list produk berhasil diambil'
-        );
     }
 
     public function update(Request $request, Food $food){
@@ -91,6 +97,7 @@ class FoodController extends Controller
                 400 
             );
         }
+        Redis::del('food_' . $food['id']);
 
         $food->name = $input['name'];
         $food->description = $input['description'];
@@ -110,6 +117,7 @@ class FoodController extends Controller
     public function destroy(Food $food)
     {
         $food->delete();
+        Redis::del('food_' . $food['id']);
         return ResponseFormatter::success(
             null,
             'Data list produk berhasil dihapus'
