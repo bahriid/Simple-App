@@ -15,7 +15,6 @@ class Transaction extends Model
      */
     protected $fillable = [
         'food_id',
-        'user_id',
         'quantity',
         'total',
         'status',
