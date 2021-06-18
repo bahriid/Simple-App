@@ -10,6 +10,6 @@ class Food extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'picturePath', 'name', 'description', 'ingredients', 'price', 'rate', 'types'
+        'picturePath', 'name', 'description', 'ingredients', 'price', 'rate', 'types', 'quantity'
     ];
 }

@@ -32,6 +32,7 @@ class FoodController extends Controller
             'description' => 'required',
             'ingredients' => 'required',
             'price' => 'required|integer',
+            'quantity' => 'required|integer',
             'rate' => 'required|integer',
             'types' => '',
         ]);
@@ -78,6 +79,7 @@ class FoodController extends Controller
             'description' => 'required',
             'ingredients' => 'required',
             'price' => 'required|integer',
+            'quantity' => 'required|integer',
             'rate' => 'required|integer',
             'types' => '',
         ]);
@@ -95,6 +97,7 @@ class FoodController extends Controller
         $food->ingredients = $input['ingredients'];
         $food->rate = $input['rate'];
         $food->price = $input['price'];
+        $food->quantity = $input['quantity'];
         $food->types = $input['types'];
         $food->save();
 

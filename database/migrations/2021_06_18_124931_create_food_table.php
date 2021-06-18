@@ -21,6 +21,7 @@ class CreateFoodTable extends Migration
             $table->text('description')->nullable();
             $table->text('ingredients')->nullable();
             $table->integer('price')->nullable();
+            $table->integer('quantity')->nullable();
             $table->double('rate')->nullable();
             $table->string('types')->default('');
 
